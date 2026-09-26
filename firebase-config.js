@@ -10,4 +10,4 @@ const firebaseConfig = {
 };
 
 // Tên người sẽ tự động là Admin khi đăng nhập (không phân biệt hoa/thường)
-const ADMIN_NAME = "Huyvu";
+const ADMIN_NAME = "Huyvu201226###";
