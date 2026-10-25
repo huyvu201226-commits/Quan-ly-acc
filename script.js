@@ -284,11 +284,11 @@ startPreload();
 
 // ===== Zoom lưới ảnh (thu nhỏ để xem nhiều ảnh hơn / phóng to để xem rõ hơn) =====
 const GRID_ZOOM_MIN = 100, GRID_ZOOM_MAX = 260, GRID_ZOOM_STEP = 20;
-let gridZoom = parseInt(localStorage.getItem('acc_gridzoom')||'', 10) || 156;
+let gridZoom = parseInt(localStorage.getItem('acc_gridzoom2')||'', 10) || (window.matchMedia('(max-width:640px)').matches ? 136 : 168);
 function applyGridZoom(){
   gridZoom = Math.max(GRID_ZOOM_MIN, Math.min(GRID_ZOOM_MAX, gridZoom));
   document.documentElement.style.setProperty('--grid-col', gridZoom+'px');
-  localStorage.setItem('acc_gridzoom', gridZoom);
+  localStorage.setItem('acc_gridzoom2', gridZoom);
 }
 document.getElementById('zoomOutBtn').onclick = ()=>{ gridZoom -= GRID_ZOOM_STEP; applyGridZoom(); };
 document.getElementById('zoomInBtn').onclick = ()=>{ gridZoom += GRID_ZOOM_STEP; applyGridZoom(); };
@@ -1154,6 +1154,7 @@ function cardHtml(a, kw, opts){
 
 function attachCardEvents(container){
   setTimeout(kbPaint,0);
+  selApply(container);
   // Acc trùng mã (viền đỏ): bấm vào acc -> sang Trang chủ, tự tìm mã trùng. Đang ở đúng kết quả tìm đó thì bấm ảnh để phóng to như bình thường.
   container.querySelectorAll('.zoomtrig').forEach(img=> img.onclick = ()=>{
     const card = img.closest('.card.dupflag');
@@ -2448,3 +2449,92 @@ function startAccountsListener(){
   listen(1, db);
   if(db2) listen(2, db2);
 }
+
+
+// ===== Chọn nhiều ảnh để xóa (chỉ Admin / Admin tổng) =====
+// Bấm "☑ Chọn nhiều" ở đầu trang -> bấm vào từng ảnh để chọn / bỏ chọn -> bấm "Xóa" ở thanh dưới.
+// Acc bị xóa được chuyển vào Thùng rác (giống nút Xóa từng acc) nên vẫn khôi phục được.
+let selMode = false;
+const selIds = new Set();
+function selTabOk(){
+  const h = document.getElementById('tab-home'), a = document.getElementById('tab-all');
+  return (h && !h.classList.contains('hide')) || (a && !a.classList.contains('hide'));
+}
+function selVisibleCards(){
+  const t = ['tab-home','tab-all'].map(i=>document.getElementById(i)).find(el=>el && !el.classList.contains('hide'));
+  return t ? Array.from(t.querySelectorAll('.card[data-id]')) : [];
+}
+function selApply(container){
+  if(!container) return;
+  container.querySelectorAll('.card[data-id]').forEach(c=> c.classList.toggle('selected', selMode && selIds.has(c.dataset.id)));
+}
+function selUpdateUi(){
+  const btn = document.getElementById('selModeBtn'), bar = document.getElementById('selBar');
+  if(!btn || !bar) return;
+  const can = isStaff() && selTabOk();
+  btn.classList.toggle('hide', !can);
+  if(!can && selMode){ selSetMode(false); return; }
+  btn.classList.toggle('on', selMode);
+  btn.textContent = selMode ? '✕ Thoát chọn' : '☑ Chọn nhiều';
+  bar.classList.toggle('hide', !selMode);
+  document.body.classList.toggle('selmode', selMode);
+  const n = selIds.size;
+  document.getElementById('selCount').textContent = 'Đã chọn ' + n;
+  document.getElementById('selDelBtn').disabled = n === 0;
+  document.getElementById('selDelBtn').textContent = n ? 'Xóa ' + n + ' acc' : 'Xóa';
+  selApply(document.getElementById('tab-home')); selApply(document.getElementById('tab-all'));
+}
+function selSetMode(on){
+  selMode = !!on;
+  if(!selMode) selIds.clear();
+  selUpdateUi();
+}
+async function selDeleteSelected(){
+  if(!isStaff() || !selIds.size) return;
+  const list = Array.from(selIds).map(id=>accounts.find(x=>x.id===id)).filter(Boolean);
+  if(!list.length){ selIds.clear(); selUpdateUi(); return; }
+  const ok = await openConfirmModal({
+    title: 'Xóa ' + list.length + ' acc',
+    message: 'Chuyển ' + list.length + ' acc đã chọn vào Thùng rác? Có thể khôi phục lại trong vòng 24 giờ.',
+    confirmLabel: 'Xóa ' + list.length + ' acc'
+  });
+  if(!ok) return;
+  const now = Date.now();
+  const res = await Promise.all(list.map(a=> accCol(a).doc(a.id).update({deletedAt: now}).then(()=>true, ()=>false)));
+  let done = 0, fail = 0;
+  list.forEach((a, i)=>{ if(res[i]){ a.deletedAt = now; selIds.delete(a.id); done++; } else fail++; });
+  rerenderAll();
+  if(fail){
+    showToast({ title:'Một số acc chưa xóa được', message:'Đã xóa '+done+' acc, '+fail+' acc bị lỗi (vẫn đang được chọn) — bấm Xóa để thử lại.', variant:'error' });
+    selUpdateUi();
+  } else {
+    showToast({ title:'Đã xóa '+done+' acc', message:'Các acc đã được chuyển vào Thùng rác.' });
+    selSetMode(false);
+  }
+}
+(function selInit(){
+  const $ = id=>document.getElementById(id);
+  $('selModeBtn').onclick = ()=> selSetMode(!selMode);
+  $('selExitBtn').onclick = ()=> selSetMode(false);
+  $('selClearBtn').onclick = ()=>{ selIds.clear(); selUpdateUi(); };
+  $('selAllBtn').onclick = ()=>{ selVisibleCards().forEach(c=> selIds.add(c.dataset.id)); selUpdateUi(); };
+  $('selDelBtn').onclick = selDeleteSelected;
+  // Đang ở chế độ chọn: bấm vào thẻ acc = chọn / bỏ chọn (chặn phóng to ảnh, Sửa, Xóa…).
+  document.addEventListener('click', e=>{
+    if(!selMode) return;
+    const card = e.target.closest && e.target.closest('.card[data-id]');
+    if(!card || !card.closest('#tab-home, #tab-all')) return;
+    e.preventDefault(); e.stopPropagation();
+    const id = card.dataset.id;
+    if(selIds.has(id)) selIds.delete(id); else selIds.add(id);
+    selUpdateUi();
+  }, true);
+  // Phím tắt trong chế độ chọn: Delete = xóa các acc đã chọn · Esc = thoát.
+  document.addEventListener('keydown', e=>{
+    if(!selMode || document.querySelector('.overlay') || isTypingField()) return;
+    if(e.key==='Delete'){ e.preventDefault(); e.stopImmediatePropagation(); selDeleteSelected(); }
+    else if(e.key==='Escape'){ e.preventDefault(); selSetMode(false); }
+  }, true);
+  document.querySelectorAll('nav button').forEach(b=> b.addEventListener('click', ()=> setTimeout(selUpdateUi, 0)));
+  document.addEventListener('acc:changed', selUpdateUi);   // sau đăng nhập / mỗi lần vẽ lại danh sách
+})();

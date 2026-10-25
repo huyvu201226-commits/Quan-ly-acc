@@ -564,3 +564,107 @@ header .who:empty{display:none}
 .pv-app .card{content-visibility:visible}
 .pv-app .toast{position:absolute;left:12px;bottom:12px;max-width:210px;animation:none}
 .pv-app .fab{position:absolute;right:12px;bottom:12px;width:44px;height:44px;font-size:22px}
+
+
+/* ===== Chọn nhiều ảnh để xóa ===== */
+#selModeBtn.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.selbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:10px 14px;background:var(--c-card-bg,#fff);color:var(--ink);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.selbar.hide{display:none}
+.selbar .selrow{display:contents}
+.selbar .selcount{font-weight:700;font-size:13px;margin-right:4px;white-space:nowrap}
+.selbar #selExitBtn{order:9}
+.selbar button{padding:8px 12px;font-size:12.5px;font-weight:600;border:1.5px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.selbar button.seldel{color:#fff;background:var(--danger);border-color:var(--danger)}
+.selbar button:disabled{opacity:.45;cursor:not-allowed}
+body.selmode .card[data-id]{cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+body.selmode .card[data-id] img{cursor:pointer}
+body.selmode .card[data-id]::before{content:"";position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.88);border:2px solid #888;z-index:5;pointer-events:none;box-sizing:border-box}
+body.selmode .card.selected{outline:4px solid var(--danger);outline-offset:-2px}
+body.selmode .card.selected::before{content:"✓";background:var(--danger);border-color:var(--danger);color:#fff;font-size:15px;font-weight:800;line-height:20px;text-align:center}
+body.selmode .card.selected img{opacity:.78}
+body.selmode #addFab{display:none}
+
+/* ===== TỐI ƯU ĐIỆN THOẠI (kích thước vừa phải, không quá to / quá nhỏ) ===== */
+.authscreen{min-height:100vh;min-height:100dvh}
+.rlist{grid-template-columns:repeat(auto-fill,minmax(min(360px,100%),1fr))}
+img{max-width:100%}
+@media (hover:none){ .card:hover{transform:none;box-shadow:var(--shadow-1)} }
+
+@media (max-width:640px){
+  html{-webkit-text-size-adjust:100%}
+  /* Thanh tiêu đề gọn, tránh tai thỏ / thanh trạng thái */
+  header{padding:calc(8px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) 8px calc(10px + env(safe-area-inset-left,0px));gap:6px}
+  header h2{font-size:15px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header .brand-logo{flex:none}
+  header .who{display:none}
+  header .ghost-btn{padding:6px 11px;font-size:12px;flex:none}
+  .zoomctl{flex:none;gap:4px;margin:0}
+  .zoomctl button{width:32px;height:32px;font-size:15px}
+  .themebtn{flex:none}
+  /* Nút "Chọn nhiều" chỉ còn biểu tượng cho đỡ chật */
+  #selModeBtn{font-size:0;padding:0;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+  #selModeBtn.hide{display:none}
+  #selModeBtn::before{content:"☑";font-size:16px;line-height:1}
+  #selModeBtn.on::before{content:"✕";font-size:15px}
+
+  /* Thanh tab: vuốt ngang, vừa ngón tay */
+  nav{width:auto;max-width:calc(100% - 20px);margin:10px 10px 0;padding:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  nav button{padding:8px 14px;font-size:13px;flex:none;scroll-snap-align:start}
+
+  main{padding:12px calc(10px + env(safe-area-inset-right,0px)) 110px calc(10px + env(safe-area-inset-left,0px))}
+  .searchbar{margin-bottom:12px}
+  .searchbar input{font-size:16px;padding:12px 14px 12px 42px;background-position:14px center;border-radius:16px}
+
+  /* Lưới ảnh: 2 cột vừa mắt, khoảng cách gọn */
+  .grid{gap:10px}
+  .card{border-radius:16px}
+  .card .info{padding:8px 10px 2px}
+  .card .code{font-size:11.5px;padding:2px 9px}
+  .card .price{font-size:12px}
+  .card .desc{font-size:12px}
+  .card .meta{font-size:9.5px;margin-top:4px}
+  .card .actions{padding:6px 8px 9px;gap:6px}
+  .card .actions button{min-height:34px;font-size:11.5px}
+  .month-h{font-size:14px;margin:18px 0 8px;padding-bottom:8px}
+  .day-h{font-size:11px;margin:10px 0 6px 2px}
+  .section-h{font-size:14px}
+
+  /* Cửa sổ nổi và form: dễ bấm, không bị iOS tự phóng to khi gõ */
+  .overlay{padding:10px}
+  .modal{padding:18px 16px;border-radius:20px;max-height:92vh;max-height:92dvh}
+  .modal h3{font-size:17px;margin-bottom:10px}
+  .modal input,.modal textarea,.modal select,.addadmin-box input,.mk-box input,.authscreen input{font-size:16px}
+  .modal label{margin:10px 0 4px}
+  .dropzone{min-height:120px}
+  .rowbtn{gap:6px;margin-top:14px;flex-wrap:wrap}
+  .rowbtn button{padding:12px 8px;font-size:13.5px;min-width:30%}
+  .addadmin-box input,.mk-box input{min-width:0;flex:1 1 100%}
+  .addadmin-box button,.mk-box button{flex:1 1 100%}
+  .dup-btns button{min-width:0}
+  .rcard{padding:10px;gap:10px}
+  .rcard>img{width:92px;height:92px}
+  .duprow img{width:52px;height:52px}
+  .dg-thumbs img{width:48px;height:48px}
+
+  /* Nút + và thông báo không đè lên nội dung */
+  .fab{width:52px;height:52px;font-size:24px;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .toast-wrap{top:calc(60px + env(safe-area-inset-top,0px));bottom:auto;left:10px;right:10px;width:auto;max-width:none}
+  .bgload{left:10px;bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 84px)}
+
+  /* Thanh chọn nhiều: 2 hàng, nút to dễ bấm */
+  .selbar{left:10px;right:10px;transform:none;max-width:none;flex-direction:column;align-items:stretch;gap:8px;padding:10px;border-radius:18px}
+  .selbar .selrow{display:flex;gap:6px;align-items:center}
+  .selbar .selrow.top{justify-content:space-between}
+  .selbar .selcount{font-size:14px;margin:0}
+  .selbar #selExitBtn{order:0}
+  .selbar button{min-height:40px;font-size:13px;padding:8px 10px}
+  .selbar .selrow:not(.top) button{flex:1 1 0}
+  .selbar .selrow:not(.top) button.seldel{flex:1.4 1 0}
+  body.selmode main{padding-bottom:150px}
+  body.selmode .card[data-id]::before{width:26px;height:26px}
+}
+@media (max-width:360px){
+  header h2{font-size:14px}
+  .zoomctl button,#selModeBtn{width:30px;height:30px}
+  nav button{padding:8px 12px;font-size:12.5px}
+}
