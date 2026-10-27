@@ -241,10 +241,18 @@ function startMarkupListener(){
     if(myRole==='superadmin' && tab && !tab.classList.contains('hide')) renderMarkupPage();
   }, ()=>{});
 }
+// Đặt nhãn + số đếm cho nút menu (hoạt động cả khi menu đã đổi sang dạng icon của dock-nav.js)
+function setNavLabel(b, label, n){
+  if(!b) return;
+  b.setAttribute('data-label', label);
+  if(n) b.setAttribute('data-badge', n>99 ? '99+' : String(n)); else b.removeAttribute('data-badge');
+  const l = b.querySelector('.dk-lbl');
+  if(l) l.textContent = label + (n ? ' ('+n+')' : ''); else b.textContent = label + (n ? ' ('+n+')' : '');
+}
 function updateMarkupBadge(){
   const b = document.getElementById('navMarkup'); if(!b) return;
   const n = accounts.filter(a=>isLive(a) && a.markup && a.markupStatus==='pending').length;
-  b.textContent = 'Giá tăng' + (n ? ' ('+n+')' : '');
+  setNavLabel(b, 'Giá tăng', n);
   updateRemindBadge();
 }
 
@@ -678,7 +686,7 @@ function checkNotices(){ checkExpiring(); checkDupAlerts(); }
 function updateHistoryBadge(){
   const b = document.getElementById('navHistory'); if(!b || !isStaff()) return;
   const n = expiringList().length + getDupMap().size;
-  b.textContent = 'Lịch sử' + (n ? ' ('+n+')' : '');
+  setNavLabel(b, 'Lịch sử', n);
 }
 
 // ===== Thông báo nổi (toast) góc phải phía dưới =====
@@ -1176,8 +1184,9 @@ function attachCardEvents(container){
     b.onclick = async ()=>{
       const id = b.dataset.restore;
       const a = accounts.find(x=>x.id===id);
-      await accCol(a).doc(id).update({deletedAt: null}).catch(()=>{});
-      if(a) a.deletedAt = null;
+      const rupd = {deletedAt: null}; if(a && a.sold) rupd.remindDone = false; // acc đã bán: khôi phục thì về lại trang Nhắc nhở, không về kho
+      await accCol(a).doc(id).update(rupd).catch(()=>{});
+      if(a) Object.assign(a, rupd);
       renderTrash(); renderAll(); renderHome();
     };
   });
@@ -1851,7 +1860,7 @@ function bulkViewCardHtml(it, i){
   const sel = bulkSel===i ? ' sel' : '';
   const dupHtml = bulkDupHtml(it, i);
   return `<div class="bulkcard${incomplete?' incomplete':''}${dupHtml?' dupflag':''}${sel}" data-idx="${i}">
-      <img src="${it.url}">
+      <img src="${it.url}" loading="lazy" decoding="async">
       <div class="bi-caption">${it.code ? escapeHtml(it.code) : '<span class="bi-hint">+ Bấm để thêm mã/giá/mô tả</span>'}${it.price?(' · '+escapeHtml(it.price)):''}</div>
       <div class="bi-dup">${dupHtml}</div>
       ${incomplete ? '<div class="bi-warn">Thiếu thông tin bắt buộc</div>' : ''}
@@ -1919,7 +1928,7 @@ function renderBulkGrid(ov){
     const sel = bulkSel===i ? ' sel' : '';
     if(bulkActiveIdx===i){
       return `<div class="bulkcard editing${sel}${bulkDupHtml(it,i)?' dupflag':''}" data-idx="${i}">
-        <img src="${it.url}">
+        <img src="${it.url}" loading="lazy" decoding="async">
         <div class="bi-dup">${bulkDupHtml(it,i)}</div>
         <input class="bi-code" data-idx="${i}" placeholder="Mã số (vd 12/205) *" value="${escapeHtml(it.code)}">
         <input class="bi-price" data-idx="${i}" placeholder="Giá (vd 50.000đ) *" value="${escapeHtml(it.price||'')}">
@@ -2218,7 +2227,7 @@ function openSoldModal(a){
   ov.innerHTML = `<div class="modal">
     <button class="close-x">✕</button>
     <h3>${editing?'Sửa lịch hẹn trả góp':'Đã bán — hẹn trả góp'}</h3>
-    <div class="sold-head">${a.imageUrl?`<img src="${a.imageUrl}">`:''}<div><span class="code tag">${escapeHtml(a.code||'')}</span><div class="rsmall">${escapeHtml(a.price||'')}</div></div></div>
+    <div class="sold-head">${a.imageUrl?`<img src="${a.imageUrl}" loading="lazy" decoding="async">`:''}<div><span class="code tag">${escapeHtml(a.code||'')}</span><div class="rsmall">${escapeHtml(a.price||'')}</div></div></div>
     <label>Hẹn ngày và giờ *</label>
     <input id="sDue" type="datetime-local" value="${toLocalInput(defDue)}">
     <label>Bán cho ai *</label>
@@ -2268,7 +2277,7 @@ function dueState(a){
 function updateRemindBadge(){
   const b = document.getElementById('navRemind'); if(!b) return;
   const n = remindList().filter(a=>(a.dueAt||0)<=Date.now()).length;
-  b.textContent = 'Nhắc nhở' + (n ? ' ('+n+')' : '');
+  setNavLabel(b, 'Nhắc nhở', n);
 }
 function renderRemind(){
   updateRemindBadge();
@@ -2279,7 +2288,7 @@ function renderRemind(){
   box.innerHTML = '<div class="rlist">' + list.map(a=>{
     const [st, label] = dueState(a), total = a.total||0, paid = a.paid||0, pct = total ? Math.min(100, Math.round(paid*100/total)) : 0;
     return `<div class="rcard r-${st}" data-id="${a.id}">
-      ${a.imageUrl ? `<img class="zoomtrig" data-id="${a.id}" src="${a.imageUrl}">` : ''}
+      ${a.imageUrl ? `<img class="zoomtrig" data-id="${a.id}" src="${a.imageUrl}" loading="lazy" decoding="async">` : ''}
       <div class="rbody">
         <div class="rdue">⏰ ${fmtDate(a.dueAt)} <span class="rbadge">${label}</span></div>
         <div class="rline"><b>Bán cho:</b> ${escapeHtml(a.buyer||'—')}</div>
@@ -2300,8 +2309,8 @@ function renderRemind(){
   box.querySelectorAll('[data-rcal]').forEach(b=> b.onclick = ()=> openCalendar(find(b.dataset.rcal)));
   box.querySelectorAll('[data-rdone]').forEach(b=> b.onclick = async ()=>{
     const a = find(b.dataset.rdone);
-    if(!await openConfirmModal({title:'Đã trả đủ', message:'Khách đã trả đủ cho acc "'+(a.code||'')+'"? Acc sẽ rời khỏi trang Nhắc nhở.', confirmLabel:'Xác nhận', danger:false})) return;
-    const upd = {remindDone:true, paid:a.total||a.paid||0};
+    if(!await openConfirmModal({title:'Đã trả đủ', message:'Khách đã trả đủ cho acc "'+(a.code||'')+'"? Acc sẽ rời trang Nhắc nhở và được chuyển vào Thùng rác.', confirmLabel:'Xác nhận', danger:false})) return;
+    const upd = {remindDone:true, paid:a.total||a.paid||0, deletedAt:Date.now()}; // trả đủ -> vào Thùng rác (không về kho vì acc đã bán)
     await accCol(a).doc(a.id).update(upd).catch(()=>{}); Object.assign(a, upd); rerenderAll();
   });
   box.querySelectorAll('[data-rback]').forEach(b=> b.onclick = async ()=>{

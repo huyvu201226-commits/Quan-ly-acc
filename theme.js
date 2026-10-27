@@ -303,10 +303,11 @@
     return `<div class="card"><img src="${PV_IMG}" alt=""><div class="info"><span class="code">${code}</span><div class="price">${price}</div><div class="desc">${desc}</div></div>
       <div class="actions"><button type="button" class="edit" tabindex="-1">Sửa</button><button type="button" class="del" tabindex="-1">Xóa</button></div></div>`;
   }
+  function dk(k, on){ return '<button type="button" class="'+(on?'active':'')+'" tabindex="-1">'+(window.DockIcons?DockIcons.svg(k):'')+'</button>'; }
   function pvApp(){
     return `<div class="pv-screen pv-app"><span class="pv-tag">Trong trang</span>
       <header>${logoEl()}<h2>Quản lý ACC</h2><span class="who">${escapeHtml(myName || 'bạn')}</span><button type="button" class="ghost-btn" tabindex="-1">Thoát</button></header>
-      <nav><button type="button" class="active" tabindex="-1">Trang chủ</button><button type="button" tabindex="-1">Acc đã thêm</button><button type="button" tabindex="-1">Lịch sử</button></nav>
+      <nav class="dock">${dk('home',1)}${dk('all')}${dk('history')}<span class="dk-sep"></span><span class="dk-sb">${window.DockIcons?DockIcons.svg('search'):''}</span></nav>
       <div class="pv-main"><div class="searchbar"><input placeholder="Tìm theo mã x/x (vd 12/205) hoặc mô tả..." readonly tabindex="-1"></div>
         <div class="grid" style="margin-top:12px">${pvCard('12/205','50.000đ','Mô tả mẫu cho acc thứ nhất')}${pvCard('88/431','120.000đ','Mô tả mẫu cho acc thứ hai')}</div></div>
       <div class="toast"><div class="toast-title">Đã lưu</div><div class="toast-msg">Thông báo mẫu</div></div>

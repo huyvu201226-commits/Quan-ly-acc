@@ -8,7 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Phông chữ tải nền: không chặn việc vẽ trang (chữ hiện ngay bằng phông hệ thống rồi tự đổi) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js">
+<link rel="preload" as="script" href="script.js">
 <link rel="stylesheet" href="style.css">
 <script>
 /* Áp chế độ sáng/tối đã chọn (hoặc theo máy) trước khi vẽ trang để không bị nháy */
@@ -63,31 +68,36 @@
 </div>
 
 <div id="app" class="hide">
-  <header>
+  <header id="topbar" class="topbar">
+    <button id="menuBtn" class="tb-menu" type="button" aria-label="Mở menu các trang" aria-expanded="false" aria-controls="tbPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <span class="brand-logo" role="img" aria-label="Logo"></span>
     <h2>Quản lý ACC</h2>
-    <div class="zoomctl">
-      <button id="zoomOutBtn" type="button" title="Thu nhỏ ảnh (xem được nhiều ảnh hơn)">－</button>
-      <button id="zoomInBtn" type="button" title="Phóng to ảnh">＋</button>
+    <div class="tb-panel" id="tbPanel">
+    <nav>
+      <button data-tab="home" class="active">Trang chủ</button>
+      <button data-tab="all">Acc đã thêm</button>
+      <button data-tab="trash" id="navTrash" class="hide">Thùng rác</button>
+      <button data-tab="history" id="navHistory" class="hide">Lịch sử</button>
+      <button data-tab="admin" id="navAdmin" class="hide">Quản trị</button>
+      <button data-tab="markup" id="navMarkup" class="hide">Giá tăng</button>
+      <button data-tab="remind" id="navRemind" class="hide">Nhắc nhở</button>
+      <button data-tab="theme" id="navTheme" class="hide">Tùy chỉnh trang</button>
+    </nav>
+      <div class="tb-tools">
+      <div class="zoomctl">
+        <button id="zoomOutBtn" type="button" title="Thu nhỏ ảnh (xem được nhiều ảnh hơn)">－</button>
+        <button id="zoomInBtn" type="button" title="Phóng to ảnh">＋</button>
+      </div>
+      <button id="selModeBtn" class="ghost-btn hide" type="button" title="Chọn nhiều ảnh để xóa cùng lúc">☑ Chọn nhiều</button>
+      <button id="themeToggle" class="themebtn" type="button" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng / tối">
+        <svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <span class="who" id="whoAmI"></span>
+      <button id="logoutBtn" class="ghost-btn">Thoát</button>
+      </div>
     </div>
-    <button id="selModeBtn" class="ghost-btn hide" type="button" title="Chọn nhiều ảnh để xóa cùng lúc">☑ Chọn nhiều</button>
-    <button id="themeToggle" class="themebtn" type="button" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng / tối">
-      <svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
-    <span class="who" id="whoAmI"></span>
-    <button id="logoutBtn" class="ghost-btn">Thoát</button>
   </header>
-  <nav>
-    <button data-tab="home" class="active">Trang chủ</button>
-    <button data-tab="all">Acc đã thêm</button>
-    <button data-tab="trash" id="navTrash" class="hide">Thùng rác</button>
-    <button data-tab="history" id="navHistory" class="hide">Lịch sử</button>
-    <button data-tab="admin" id="navAdmin" class="hide">Quản trị</button>
-    <button data-tab="markup" id="navMarkup" class="hide">Giá tăng</button>
-    <button data-tab="remind" id="navRemind" class="hide">Nhắc nhở</button>
-    <button data-tab="theme" id="navTheme" class="hide">Tùy chỉnh trang</button>
-  </nav>
   <main>
     <div id="tab-home">
       <div class="searchbar"><input id="searchInput" placeholder="Tìm theo mã x/x (vd 12/205) hoặc mô tả..."></div>
@@ -139,6 +149,8 @@
 <script src="firebase-config.js"></script>
 <script src="save-queue.js"></script>
 <script src="script.js"></script>
+<script src="dock-nav.js"></script>
+<script src="topbar.js"></script>
 <script src="theme-save.js"></script>
 <script src="theme.js"></script>
 <script src="theme-mode.js"></script>

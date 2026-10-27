@@ -668,3 +668,201 @@ img{max-width:100%}
   .zoomctl button,#selModeBtn{width:30px;height:30px}
   nav button{padding:8px 12px;font-size:12.5px}
 }
+
+/* ================= Thanh menu kiểu Apple (dock) — file dock-nav.js ================= */
+nav.dock{display:flex;align-items:center;gap:6px;width:fit-content;max-width:calc(100% - 20px);margin:18px auto 0;padding:9px 11px 17px;
+  border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:26px;
+  background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);
+  box-shadow:0 14px 34px -12px rgba(10,31,44,.28),0 2px 6px rgba(10,31,44,.06),inset 0 1px 0 color-mix(in srgb,#fff 55%,transparent);
+  overflow-x:visible;position:relative;z-index:30;animation:dkIn .55s cubic-bezier(.2,.9,.3,1.15) both}
+nav.dock>:first-child{margin-left:auto}
+nav.dock>:last-child{margin-right:auto}
+:root[data-theme="dark"] nav.dock{box-shadow:0 16px 38px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.3),inset 0 1px 0 color-mix(in srgb,#fff 12%,transparent)}
+@keyframes dkIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+
+nav.dock button,nav.dock .dk-sb{position:relative;flex:none;width:46px;height:46px;padding:0;display:grid;place-items:center;font-size:0;
+  border:1px solid var(--c-nav-line);border-radius:16px;color:var(--sub);cursor:pointer;
+  background:color-mix(in srgb,var(--card) 92%,var(--bg));
+  box-shadow:0 1px 2px rgba(10,31,44,.08),0 6px 12px -6px rgba(10,31,44,.18);
+  transform:translateY(var(--y,0px)) scale(var(--s,1));
+  transition:transform .22s cubic-bezier(.3,1.5,.5,1),box-shadow .2s,color .2s,background .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;outline:none}
+nav.dock button:hover,nav.dock .dk-sb:hover{color:var(--ink);background:var(--card);box-shadow:0 2px 4px rgba(10,31,44,.1),0 12px 22px -8px rgba(10,31,44,.3)}
+nav.dock button:active,nav.dock .dk-sb:active{transform:translateY(var(--y,0px)) scale(.92)}
+nav.dock button:focus-visible,nav.dock .dk-sb:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--edit) 45%,transparent)}
+nav.dock button.active{color:var(--ink);background:var(--card);border-color:var(--c-nav-active-bg);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--c-nav-active-bg) 16%,transparent),0 10px 18px -8px rgba(10,31,44,.35)}
+nav.dock button.active::after{content:"";position:absolute;left:50%;bottom:-11px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--c-nav-active-bg)}
+nav.dock .dk-sb.on{background:color-mix(in srgb,var(--ink) 7%,var(--card));color:var(--sub);box-shadow:inset 0 2px 5px rgba(10,31,44,.14)}
+nav.dock .dk-ico,.dk-spot .dk-ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+nav.dock .dk-lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+nav.dock button[data-badge]::before{content:attr(data-badge);position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--danger);color:#fff;font:700 10.5px/18px var(--ff);text-align:center;box-shadow:0 0 0 2px var(--card);z-index:2}
+.dk-sep{flex:none;width:1px;height:26px;margin:0 4px;background:var(--line)}
+
+/* Nhãn nổi */
+.dk-tip{position:fixed;z-index:200;pointer-events:none;padding:7px 12px;border-radius:9px;background:var(--c-nav-active-bg,var(--accent));color:var(--c-nav-active-ink,var(--accent-ink));
+  font:600 12px/1 var(--ff);white-space:nowrap;opacity:0;transform:translate(-50%,calc(-100% - 6px)) scale(.9);transform-origin:50% 100%;
+  transition:opacity .15s,transform .2s cubic-bezier(.3,1.4,.5,1);box-shadow:0 8px 20px -6px rgba(10,31,44,.4)}
+.dk-tip.on{opacity:1;transform:translate(-50%,calc(-100% - 14px)) scale(1)}
+.dk-tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;margin-left:-4px;background:inherit;transform:rotate(45deg);border-radius:0 0 2px 0}
+
+/* Ô tìm kiếm bung ra dưới menu */
+.dk-spot{width:min(540px,calc(100% - 20px));margin:0 auto;max-height:0;opacity:0;overflow:hidden;padding:0 8px;transform:translateY(-8px) scale(.98);pointer-events:none;
+  transition:max-height .34s cubic-bezier(.3,1.2,.5,1),opacity .2s,transform .34s cubic-bezier(.3,1.2,.5,1),padding .3s;position:relative;z-index:29}
+.dk-spot.open{max-height:90px;opacity:1;transform:none;padding:12px 8px 14px;pointer-events:auto}
+.dk-spot-in{display:flex;align-items:center;gap:10px;height:46px;padding:0 8px 0 16px;border:1px solid var(--line);border-radius:15px;background:var(--card);color:var(--sub);
+  box-shadow:0 10px 26px -12px rgba(10,31,44,.35)}
+.dk-spot-in:focus-within{border-color:var(--c-nav-active-bg);box-shadow:0 0 0 3px color-mix(in srgb,var(--c-nav-active-bg) 14%,transparent),0 10px 26px -12px rgba(10,31,44,.35)}
+.dk-spot .dk-spot-in input{flex:1;min-width:0;height:100%;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:500 14px var(--ff-body);box-shadow:none}
+.dk-spot .dk-x{flex:none;width:30px;height:30px;padding:0;display:grid;place-items:center;border:0;border-radius:50%;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--sub)}
+.dk-spot .dk-x:hover{background:var(--ink);color:var(--bg)}
+.dk-spot .dk-x .dk-ico{width:15px;height:15px}
+
+/* Xem thử trong trang Tùy chỉnh */
+.pv-app nav.dock{margin-top:10px;animation:none;gap:4px;padding:7px 8px 14px}
+.pv-app nav.dock button,.pv-app nav.dock .dk-sb{width:38px;height:38px;border-radius:13px}
+.pv-app nav.dock .dk-ico{width:19px;height:19px}
+
+@media (max-width:640px){
+  nav.dock{gap:4px;padding:8px 8px 16px;border-radius:22px;overflow-x:auto;overflow-y:hidden;max-width:calc(100% - 16px);margin:12px auto 0;scrollbar-width:none}
+  nav.dock::-webkit-scrollbar{display:none}
+  nav.dock button,nav.dock .dk-sb{width:42px;height:42px;border-radius:14px;padding:0}
+  .dk-sep{margin:0 2px}
+}
+@media (prefers-reduced-motion:reduce){
+  nav.dock{animation:none}
+  nav.dock button,nav.dock .dk-sb,.dk-spot,.dk-tip{transition:none}
+}
+
+/* ================= Đăng nhập kiểu Neumorphism (nền mềm, thẻ nổi, ô nhập chìm) ================= */
+:root{--nm-dk:color-mix(in srgb,var(--bg) 70%,#5d6f8a);--nm-lt:color-mix(in srgb,var(--bg) 30%,#fff)}
+:root[data-theme="dark"]{--nm-dk:rgba(0,0,0,.62);--nm-lt:color-mix(in srgb,var(--bg) 90%,#fff)}
+:is(.authscreen,.pv-auth) .box{display:block;max-width:390px;padding:36px 32px 32px;overflow:visible;text-align:left;border:0;border-radius:32px;background:var(--bg);
+  box-shadow:14px 14px 30px var(--nm-dk),-14px -14px 30px var(--nm-lt)}
+:is(.authscreen,.pv-auth) .auth-hero{display:block;clip-path:none;background:none;padding:0 0 4px;text-align:left}
+:is(.authscreen,.pv-auth) .auth-hero .brand-logo{margin:0 0 16px}
+:is(.authscreen,.pv-auth) .auth-hero h2{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+:is(.authscreen,.pv-auth) .auth-hero p{display:block;font-size:14px;line-height:1.5;color:var(--sub);margin:0}
+:is(.authscreen,.pv-auth) .auth-form{padding:0;display:block}
+:is(.authscreen,.pv-auth) h1{display:none}
+:is(.authscreen,.pv-auth) .authsub{text-align:left;font-size:12.5px;color:var(--sub);margin:8px 0 22px;opacity:.85}
+:is(.authscreen,.pv-auth) .field{margin-bottom:18px}
+:is(.authscreen,.pv-auth) .field svg{left:18px}
+:is(.authscreen,.pv-auth) input{height:52px;padding:0 18px 0 46px;border:0;border-radius:16px;background:var(--bg);color:var(--ink);
+  box-shadow:inset 6px 6px 12px var(--nm-dk),inset -6px -6px 12px var(--nm-lt)}
+:is(.authscreen,.pv-auth) input:focus{border:0;box-shadow:inset 6px 6px 12px var(--nm-dk),inset -6px -6px 12px var(--nm-lt),0 0 0 2px color-mix(in srgb,var(--edit) 42%,transparent)}
+:is(.authscreen,.pv-auth) button{height:52px;margin-top:8px;padding:0;border:0;border-radius:16px;background:var(--bg);color:var(--edit);font-size:15.5px;font-weight:700;
+  box-shadow:6px 6px 12px var(--nm-dk),-6px -6px 12px var(--nm-lt);transition:box-shadow .15s,transform .15s,color .2s}
+:is(.authscreen,.pv-auth) button:hover{opacity:1;transform:none;color:var(--ink)}
+:is(.authscreen,.pv-auth) button:active{transform:none;box-shadow:inset 4px 4px 8px var(--nm-dk),inset -4px -4px 8px var(--nm-lt)}
+@media(max-width:680px){
+  .authscreen .box{max-width:380px;padding:30px 24px 26px}
+  .authscreen .auth-hero{padding:0 0 4px;text-align:left;align-items:stretch}
+  .authscreen .auth-hero .brand-logo{align-self:auto;margin:0 0 14px}
+  .authscreen .auth-hero h2{font-size:25px}
+  .authscreen .auth-form{padding:0}
+}
+
+/* ================= Thanh đầu trang 80%, thu thành nút ☰ khi lướt xuống — file topbar.js ================= */
+html{scroll-padding-top:90px}
+#app::before{content:"";display:block;height:88px}
+#topbar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:10%;right:auto;width:80%;height:56px;z-index:60;display:flex;align-items:center;gap:12px;
+  padding:0 12px 0 16px;border:1px solid color-mix(in srgb,var(--c-header-line) 70%,transparent);border-radius:28px;
+  background:color-mix(in srgb,var(--card) 84%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(16px);backdrop-filter:saturate(1.6) blur(16px);
+  box-shadow:0 14px 34px -14px rgba(10,31,44,.3),0 2px 6px rgba(10,31,44,.06),inset 0 1px 0 color-mix(in srgb,#fff 50%,transparent);
+  transition:left .45s cubic-bezier(.3,1.1,.4,1),width .45s cubic-bezier(.3,1.1,.4,1),height .35s,padding .3s,border-radius .3s,gap .3s}
+:root[data-theme="dark"] #topbar{box-shadow:0 16px 38px -14px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.3),inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent)}
+#topbar h2{flex:none;font-size:16px;margin:0;white-space:nowrap}
+#topbar .brand-logo{flex:none}
+#topbar .tb-menu{display:none;flex:none;width:40px;height:40px;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);place-items:center;
+  box-shadow:0 1px 2px rgba(10,31,44,.08),0 6px 12px -6px rgba(10,31,44,.2)}
+#topbar .tb-menu svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;transition:transform .25s}
+#topbar.open .tb-menu svg{transform:rotate(90deg)}
+#topbar .tb-panel{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+#topbar nav.dock{flex:1;min-width:0;width:auto;max-width:none;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;
+  -webkit-backdrop-filter:none;backdrop-filter:none;animation:none;overflow:visible;justify-content:center;z-index:auto}
+#topbar{--bs:40px}
+#topbar nav.dock button,#topbar nav.dock .dk-sb{width:var(--bs);height:var(--bs);border-radius:calc(var(--bs)*.35)}
+#topbar nav.dock .dk-ico{width:calc(var(--bs)*.55);height:calc(var(--bs)*.55)}
+#topbar.notitle>h2{display:none}
+#topbar.measuring,#topbar.measuring *{transition:none!important}
+#topbar nav.dock button.active::after{bottom:-8px}
+#topbar .tb-tools{flex:none;display:flex;align-items:center;gap:8px}
+
+/* Dạng thu gọn: chỉ có nút ☰ ở góc trái (lướt xuống) hoặc ☰ + tên (điện thoại) */
+#topbar.compact .tb-menu{display:grid}
+#topbar.mini{left:14px;width:56px;height:56px;padding:0 7px;gap:0;border-radius:28px}
+#topbar.mini>.brand-logo,#topbar.mini>h2{display:none}
+#topbar.compact .tb-panel{position:absolute;top:calc(100% + 10px);left:0;width:min(310px,calc(100vw - 24px));flex-direction:column;align-items:stretch;gap:8px;padding:10px;
+  background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 26px 56px -16px rgba(10,31,44,.45);
+  transform-origin:0 0;opacity:0;visibility:hidden;transform:translateY(-12px) scale(.94);max-height:calc(100vh - 110px);overflow-y:auto;
+  transition:opacity .2s,transform .3s cubic-bezier(.3,1.25,.5,1),visibility 0s .3s}
+#topbar.compact.open .tb-panel{opacity:1;visibility:visible;transform:none;transition:opacity .2s,transform .3s cubic-bezier(.3,1.25,.5,1),visibility 0s}
+#topbar.compact nav.dock{flex-direction:column;align-items:stretch;gap:4px;width:100%;flex:none}
+#topbar.compact nav.dock>:first-child,#topbar.compact nav.dock>:last-child{margin:0}
+#topbar.compact nav.dock button,#topbar.compact nav.dock .dk-sb{width:100%;height:46px;border-radius:15px;display:flex;align-items:center;justify-content:flex-start;gap:14px;padding:0 14px;
+  font:600 14.5px var(--ff);border-radius:15px;background:transparent;box-shadow:none;border-color:transparent;transform:none!important;color:var(--ink)}
+#topbar.compact nav.dock button:hover,#topbar.compact nav.dock .dk-sb:hover{background:color-mix(in srgb,var(--ink) 6%,transparent);box-shadow:none}
+#topbar.compact nav.dock button.active{background:color-mix(in srgb,var(--c-nav-active-bg) 13%,var(--card));border-color:transparent;box-shadow:none}
+#topbar.compact nav.dock button.active::after{display:none}
+#topbar.compact nav.dock .dk-ico{width:22px;height:22px}
+#topbar.compact nav.dock .dk-lbl{position:static;width:auto;height:auto;clip:auto;overflow:visible}
+#topbar.compact nav.dock .dk-sb::after{content:attr(data-label)}
+#topbar.compact nav.dock button[data-badge]::before{top:50%;right:12px;transform:translateY(-50%)}
+#topbar.compact .dk-sep{width:100%;height:1px;margin:4px 0}
+#topbar.compact .tb-tools{flex-wrap:wrap;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line-soft)}
+#topbar.compact .who:not(:empty){display:inline-block}
+@media(max-width:760px){
+  #topbar{left:10px;width:calc(100% - 20px);height:54px;padding:0 8px;gap:10px}
+  #topbar.mini{left:10px;width:54px;height:54px;padding:0 7px}
+  #app::before{height:80px}
+}
+@media (prefers-reduced-motion:reduce){#topbar,#topbar.compact .tb-panel{transition:none}}
+
+/* nhãn nổi hiện bên dưới thanh đầu trang + ô tìm kiếm nổi */
+.dk-tip.below{transform:translate(-50%,6px) scale(.9);transform-origin:50% 0}
+.dk-tip.below.on{transform:translate(-50%,12px) scale(1)}
+.dk-tip.below::after{bottom:auto;top:-4px;border-radius:2px 0 0 0}
+.dk-spot{position:fixed;top:calc(82px + env(safe-area-inset-top,0px));left:50%;width:min(560px,calc(100% - 24px));max-height:none;margin:0;padding:0;overflow:visible;
+  opacity:0;transform:translate(-50%,-10px) scale(.98);pointer-events:none;z-index:55;transition:opacity .2s,transform .3s cubic-bezier(.3,1.2,.5,1)}
+.dk-spot.open{max-height:none;padding:0;opacity:1;transform:translate(-50%,0);pointer-events:auto}
+
+/* Dạng thu gọn (cửa sổ hẹp / điện thoại): thanh chỉ rộng vừa nội dung ở góc trái, không dàn ra 80–90% trang */
+#topbar.compact:not(.mini){left:14px;width:auto;max-width:calc(100% - 28px);padding:0 18px 0 7px;gap:10px}
+#topbar.compact:not(.mini) h2{overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:760px){#topbar.compact:not(.mini){left:10px;width:auto;max-width:calc(100% - 20px)}}
+
+/* Tối ưu cửa sổ hẹp: giữ icon trang trên thanh, đưa nút phụ (Sáng/Tối, Thoát…) vào ☰ */
+#topbar.nologo>.brand-logo{display:none}
+#topbar.slim{padding-left:10px;gap:10px}
+#topbar.slim .tb-menu{display:grid}
+#topbar.slim .tb-panel{display:contents}
+#topbar.slim .tb-tools{position:absolute;top:calc(100% + 10px);left:0;min-width:250px;flex-wrap:wrap;justify-content:space-between;gap:10px;padding:12px;
+  background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 56px -16px rgba(10,31,44,.45);
+  transform-origin:0 0;opacity:0;visibility:hidden;transform:translateY(-12px) scale(.94);
+  transition:opacity .2s,transform .3s cubic-bezier(.3,1.25,.5,1),visibility 0s .3s}
+#topbar.slim.open .tb-tools{opacity:1;visibility:visible;transform:none;transition:opacity .2s,transform .3s cubic-bezier(.3,1.25,.5,1),visibility 0s}
+#topbar.slim .who:not(:empty){display:inline-block}
+#topbar.compact:not(.mini){padding-left:7px}
+
+
+/* ================= Tối ưu độ mượt ================= */
+/* Kính mờ nhẹ hơn (blur lớn rất tốn GPU khi cuộn); điện thoại bỏ hẳn blur, dùng nền đặc hơn */
+#topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);background:color-mix(in srgb,var(--card) 90%,transparent)}
+@media(max-width:560px){#topbar{-webkit-backdrop-filter:none;backdrop-filter:none;background:color-mix(in srgb,var(--card) 96%,transparent)}}
+@media(prefers-reduced-transparency:reduce){#topbar{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--card)}}
+/* Báo trước cho trình duyệt những phần hay chuyển động để nó tách lớp riêng, không vẽ lại cả trang */
+#topbar{will-change:left,width}
+.dk-tip,.dk-spot{will-change:transform,opacity}
+/* Vùng cuộn dài: bỏ hiệu ứng nền tốn kém ở thẻ khi đang cuộn */
+@media(hover:none){.card{transition:none}}
+
+/* ===== Chuyển động thanh đầu trang mượt (ghi đè) ===== */
+#topbar{-webkit-backdrop-filter:none;backdrop-filter:none;background:color-mix(in srgb,var(--card) 94%,transparent);
+  box-shadow:0 8px 22px -12px rgba(10,31,44,.35),0 1px 3px rgba(10,31,44,.08);
+  transition:left .38s cubic-bezier(.22,.9,.3,1),width .38s cubic-bezier(.22,.9,.3,1),padding .3s ease;will-change:auto;contain:layout style}
+:root[data-theme="dark"] #topbar{box-shadow:0 8px 22px -12px rgba(0,0,0,.7),0 1px 3px rgba(0,0,0,.3)}
+#topbar.anim{overflow:hidden}
+#topbar.compact:not(.mini){width:var(--cw,auto)}
+#topbar.measuring,#topbar.measuring *{transition:none!important}

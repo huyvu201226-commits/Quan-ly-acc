@@ -1,6 +1,6 @@
 # Quản lý ACC — hướng dẫn cài đặt
 
-Bộ file gồm: `index.html`, `style.css`, `script.js`, `theme.js`, `theme-save.js`, `theme-mode.js`, `save-queue.js`, `firebase-config.js`. Khi đăng lên GitHub phải upload đủ tất cả (nhất là `theme-save.js` mới thêm).
+Bộ file gồm: `index.html`, `style.css`, `script.js`, `theme.js`, `theme-save.js`, `theme-mode.js`, `save-queue.js`, `dock-nav.js`, `topbar.js`, `firebase-config.js`. Khi đăng lên GitHub phải upload đủ tất cả (nhất là `theme-save.js`, `dock-nav.js` và `topbar.js` mới thêm).
 Dữ liệu (ảnh, mã acc, mô tả, lịch sử đăng nhập, phân quyền admin) được lưu trên **Firebase Firestore** (miễn phí, không cần thẻ), không lưu trong file nên sẽ không mất khi tải lại trang hay đổi máy. Ảnh được nén nhỏ và lưu thẳng vào Firestore dạng base64 — không cần dùng Firebase Storage (Storage hiện bắt buộc gói trả phí Blaze nên app này tránh dùng để bạn không cần thêm thẻ).
 
 ## Dữ liệu độc lập, không ảnh hưởng trang cũ
@@ -177,3 +177,36 @@ Danh sách acc tự cập nhật theo thời gian thực (không cần F5): thê
 - **Logo trang** (Tùy chỉnh trang → mục *Logo trang*): bấm *Chọn logo từ máy…* để chọn ảnh ngay trên máy (tự cắt vuông ở giữa, nén còn rất nhẹ). Logo nằm trong **khung tròn không chữ "ACC", không nền**; hiện ở màn hình tải, đăng nhập, thanh tiêu đề và làm biểu tượng tab trình duyệt. Logo không có viền; chưa chọn ảnh thì chỗ đó để trống. Bấm *✕ Bỏ logo* để xóa.
 - **Xem thử trực tiếp** (khung nổi ngay trên thanh Lưu ở trang Tùy chỉnh): 3 nút *Tải trang & đăng nhập* / *Trong trang* / *Cả hai*. Kéo bảng màu, đổi nền, phông, logo hay sửa chữ lời chào thì các khung demo đổi ngay. Có nút *Thu gọn* khi cần thêm chỗ.
 - **Lưu nhanh** (file riêng `theme-save.js`): bấm Lưu (hoặc **Ctrl+S**) là giao diện áp dụng ngay trên máy, việc ghi lên Firestore chạy ở nền; bấm liên tục chỉ ghi bản mới nhất; không có gì thay đổi thì không ghi; lỗi mạng tự thử lại 1 lần, vẫn lỗi thì giữ nguyên bản đang chỉnh để bấm Lưu lại. Nhãn cạnh nút Lưu báo *Đang đồng bộ… / Đã lưu / Chưa lên mạng*. Nén ảnh nền cũng dùng module này nên nhanh hơn trước.
+
+
+## Thanh menu kiểu Apple — file `dock-nav.js` (mới)
+- Menu chữ đổi thành **dock icon bo tròn**: nút đang chọn có viền + chấm nhỏ bên dưới, số thông báo (Lịch sử, Giá tăng, Nhắc nhở) hiện thành chấm đỏ góc nút.
+- **Rê chuột**: nút phóng to dần theo khoảng cách như dock macOS, kèm nhãn nổi phía trên. Trên điện thoại: chạm vào nút hiện nhãn khoảng 1 giây, dock vuốt ngang được.
+- **Nút kính lúp** (bên phải vạch ngăn) hoặc **Ctrl+K**: bung ô tìm kiếm nhanh dưới dock. Gõ là tự sang Trang chủ và lọc acc (dùng chung ô tìm kiếm cũ). Nút ✕ xóa chữ, bấm lần nữa hoặc **Esc** để đóng.
+- Màu dock theo chủ đề ở "Tùy chỉnh trang" (nền/viền/màu nút menu đang chọn); khung xem thử cũng đã đổi sang dock.
+
+## Đẩy code lên GitHub bằng terminal (`up.bat` / `up.sh`)
+Để cả bộ file trong **một thư mục**, mở terminal ngay thư mục đó:
+- **Windows**: bấm đúp `up.bat` (hoặc gõ `up.bat "lời nhắn"`).
+- **Mac/Linux**: `chmod +x up.sh` một lần, rồi `./up.sh "lời nhắn"`.
+
+Lần đầu script hỏi link repo GitHub (vd `https://github.com/ten-ban/acc-manager.git`) và nhớ lại; các lần sau chỉ cần chạy lại là tự `add → commit → pull → push` lên nhánh `main`. Cần cài Git và đã đăng nhập GitHub (trình duyệt hiện lên hoặc dùng Personal Access Token). Đợi ~1 phút rồi Ctrl+F5 trang GitHub Pages.
+
+
+## Thanh đầu trang 80% + nút ☰ (file `topbar.js`, mới)
+- Ở đầu trang: thanh **thon dài, rộng 80% màn hình**, căn giữa, luôn dính trên cùng (tên trang bên trái, các nút trang ở giữa, Sáng/Tối + Thoát bên phải).
+- **Lướt xuống** (quá ~80px): thanh tự thu lại chỉ còn **nút ☰ nhỏ ở góc trái**; lướt về gần đầu trang thì tự bung lại.
+- **Bấm ☰**: danh sách các trang xổ xuống bên dưới (kèm kính lúp tìm kiếm, nút Sáng/Tối, Thoát). Chọn trang, bấm ra ngoài hoặc Esc để đóng.
+- Cửa sổ hẹp: thu nhỏ icon -> ẩn tên trang -> đưa Sáng/Tối, Thoát vào ☰ (icon trang vẫn hiện); điện thoại (≤560px): chỉ còn ☰ xổ xuống.
+
+## Đăng nhập kiểu Neumorphism
+Thẻ nổi mềm, ô nhập chìm, nút nổi chữ màu nhấn — màu nền/bóng tự theo chủ đề sáng/tối của trang.
+
+## Nút "Đã trả đủ" (trang Nhắc nhở)
+Bấm xác nhận → acc **vào Thùng rác** (không trả về kho vì đã bán). Khôi phục từ Thùng rác thì acc quay lại trang Nhắc nhở. Như mọi acc trong Thùng rác, sau 24 giờ sẽ bị xóa hẳn.
+
+## Tối ưu tốc độ & độ mượt (đã làm)
+- Phông chữ Google tải nền, **không chặn việc vẽ trang** (chữ hiện ngay rồi tự đổi phông); Firebase + `script.js` được tải sớm song song với CSS.
+- Thêm `loading="lazy" decoding="async"` cho các ảnh còn lại (Nhắc nhở, đã bán, ảnh hàng loạt) để không giải mã ảnh ngoài màn hình.
+- Thanh đầu trang: kính mờ nhẹ hơn (điện thoại bỏ hẳn), sự kiện cuộn gộp mỗi khung hình 1 lần.
+- Phần vẽ danh sách đã có sẵn: chia trang 60 acc, bỏ qua tab đang ẩn, không vẽ lại khi dữ liệu không đổi, `content-visibility` cho thẻ.
